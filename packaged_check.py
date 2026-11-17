@@ -33,6 +33,34 @@ def run(report_path):
             assert set(TEXT[language])==set(TEXT['KOR'])
         assert app.engine.ready.wait(20),'Engine initialization timed out'
         report['engine_ready']=True
+        # Exercise the real mapped EXE window, not just Python-level settings.
+        import ctypes
+        import time
+        from ctypes import wintypes
+        from PIL import ImageGrab
+        root.geometry('+40+40');root.deiconify();root.update()
+        user=ctypes.windll.user32
+        hwnd=user.GetAncestor(root.winfo_id(),2)
+        user.GetWindowDisplayAffinity.argtypes=[wintypes.HWND,ctypes.POINTER(wintypes.DWORD)]
+        affinity=wintypes.DWORD()
+        assert user.GetWindowDisplayAffinity(hwnd,ctypes.byref(affinity))
+        report['capture_affinity']=affinity.value
+        assert affinity.value==0
+        report['obs_toolwindow']=bool(user.GetWindowLongW(hwnd,-20)&0x80)
+        assert not report['obs_toolwindow']
+        marker=tk.Canvas(root,width=24,height=24,bg='#12ab34',highlightthickness=0)
+        marker.place(x=20,y=20);root.update()
+        captured=False
+        for _ in range(20):
+            root.update();time.sleep(.1)
+            x,y=marker.winfo_rootx()+12,marker.winfo_rooty()+12
+            pixel=ImageGrab.grab(bbox=(x,y,x+1,y+1),include_layered_windows=True).convert('RGB').getpixel((0,0))
+            if pixel==(18,171,52):
+                captured=True
+                break
+        report['window_visible_in_screenshot']=captured
+        assert captured,'Application window missing from desktop screenshot'
+        marker.destroy()
         report['languages']=list(TEXT)
         report['data_next_to_exe']=DATA_ROOT!=ROOT
         report['ok']=True

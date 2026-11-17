@@ -122,7 +122,7 @@ class App:
         grip.bind('<ButtonPress-1>',self.begin_resize)
         grip.bind('<B1-Motion>',self.resize)
         root.bind('<Configure>',self.on_configure)
-        root.after(100,self.exclude_capture)
+        root.bind('<Map>',self.on_map,add='+')
         self.render()
         self.engine=engine_factory(ROOT/'models',self.events)
         self.hotkey_thread=threading.Thread(target=self.hotkeys,daemon=True)
@@ -296,13 +296,27 @@ class App:
         if event.widget is self.root:
             for widget in self.wrap_widgets: widget.configure(wraplength=max(250,event.width-44))
 
-    def exclude_capture(self):
+    def on_map(self,event):
+        if event.widget is self.root:
+            self.configure_capture()
+
+    def configure_capture(self):
+        """Expose the borderless window to screenshots and OBS window capture."""
         from ctypes import wintypes
         user=ctypes.windll.user32
-        user.GetParent.argtypes=[wintypes.HWND]; user.GetParent.restype=wintypes.HWND
+        user.GetAncestor.argtypes=[wintypes.HWND,wintypes.UINT]; user.GetAncestor.restype=wintypes.HWND
         user.SetWindowDisplayAffinity.argtypes=[wintypes.HWND,wintypes.DWORD]
-        hwnd=user.GetParent(self.root.winfo_id()) or self.root.winfo_id()
-        self.capture_excluded=bool(user.SetWindowDisplayAffinity(hwnd,0x11))
+        user.SetWindowDisplayAffinity.restype=wintypes.BOOL
+        user.GetWindowLongW.argtypes=[wintypes.HWND,ctypes.c_int]; user.GetWindowLongW.restype=ctypes.c_long
+        user.SetWindowLongW.argtypes=[wintypes.HWND,ctypes.c_int,ctypes.c_long]
+        user.SetWindowPos.argtypes=[wintypes.HWND,wintypes.HWND,ctypes.c_int,ctypes.c_int,ctypes.c_int,ctypes.c_int,wintypes.UINT]
+        hwnd=user.GetAncestor(self.root.winfo_id(),2) or self.root.winfo_id()
+        # OCR-only exclusion also blocks broadcasting. Leave capture enabled.
+        user.SetWindowDisplayAffinity(hwnd,0)
+        # Tk's override-redirect creates a TOOLWINDOW, which OBS filters out.
+        style=user.GetWindowLongW(hwnd,-20)
+        user.SetWindowLongW(hwnd,-20,(style & ~0x80) | 0x40000)
+        user.SetWindowPos(hwnd,None,0,0,0,0,0x01|0x02|0x04|0x10|0x20)
 
     def change_language(self):
         self.render()

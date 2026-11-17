@@ -15,6 +15,7 @@ Godius 이동속도를 화면의 좌표로 측정하는 Windows 오버레이입�
 첫 좌표 변화는 기준점으로만 쓰고 마지막 구간은 제외합니다. 남은 시간 합을 이동 칸 수로 나누며, 최소 세 번의 좌표 변화가 필요합니다. 정지 판정 기본값은 700ms입니다.
 
 - 상단을 드래그해 이동하고 오른쪽 아래 손잡이로 크기를 조절합니다.
+- OBS 윈도우 캡처에서 **GodiSpeedMeter · Ctrl+F**를 선택하면 방송에 표시할 수 있습니다. 스크린샷에도 표시됩니다. 측정기 창이 게임 좌표 표시를 가리지 않게 배치하세요.
 - **기록 초기화**로 기록·전체 평균을 초기화합니다. 전체 평균은 포함된 각 시도의 평균을 동일한 비중으로 계산합니다.
 - 기록 행을 더블클릭하면 최대 캡처 간격, 처리 지연, OCR 시간과 검토 사유를 볼 수 있습니다. **선택 포함 / 제외**로 평균 대상을 변경합니다.
 - 설정은 EXE 옆 `preferences.json`, 진단 로그는 `logs/`에 저장됩니다. 기록 초기화는 저장된 로그를 삭제하지 않습니다.
@@ -33,6 +34,8 @@ Godius 이동속도를 화면의 좌표로 측정하는 Windows 오버레이입�
 
 上部ドラッグで移動、右下でサイズ変更できます。設定はEXEの隣、ログは `logs/` に保存します。履歴クリアで保存済みログは削除されません。
 
+OBSのウィンドウキャプチャで **GodiSpeedMeter · Ctrl+F** を選択すると配信に表示できます。スクリーンショットにも表示されます。ゲームの座標表示を測定ウィンドウで隠さないようにしてください。
+
 同一の数字画像ではOCR結果を再利用しますが、取得時刻は毎回新しく記録します。画面更新や認識の誤差があるため複数回測定してください。装備・条件を変更したら履歴をクリアしてください。
 
 ## English
@@ -44,6 +47,8 @@ Bring Godius to the foreground, press **Ctrl+F**, move along one axis, then stop
 The first coordinate change sets the baseline and the last interval is excluded. The overall mean equally weights included run averages. Double-click a history row for capture/OCR diagnostics and review suggestions; use **Include / Exclude selected** to change the mean's inputs.
 
 Drag the header to move, and the bottom-right handle to resize. Settings are saved beside the EXE and diagnostic logs in `logs/`. Clearing history does not delete saved logs.
+
+Select **GodiSpeedMeter · Ctrl+F** in OBS Window Capture to show the meter on stream. The meter also appears in screenshots. Keep its window clear of the game's coordinate display.
 
 Capture and OCR run independently. Recognized number images are cached, but timestamps are always captured anew. Display refresh and recognition can introduce error. Use longer repeated runs, and clear history when equipment or conditions change. Review suggestions do not prove the cause of an unusual result or automatically exclude it.
 
