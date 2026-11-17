@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+build/
+dist/
+logs/
+tmp/
+preferences.json
+settings.json
+*.log
+self-test.json
